@@ -1,0 +1,33 @@
+{
+  "name": "nexusai",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n \"backend,frontend\" -c \"cyan,magenta\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "tsx watch backend/src/server.ts",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "test": "tsx tests/run-all-tests.ts",
+    "test:mcp": "tsx tests/integration/mcp-test.ts",
+    "build": "npm --prefix frontend run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/multer": "^2.3.0",
+    "@types/node": "^26.6.5",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.8",
+    "express": "^5.3.0",
+    "multer": "^2.4.0",
+    "pdf-parse": "^2.4.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6"
+  }
+}
