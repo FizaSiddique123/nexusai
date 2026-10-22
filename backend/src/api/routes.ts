@@ -8,6 +8,11 @@ import { QuizService } from '../services/quizService.js';
 import { PreferenceService } from '../services/preferenceService.js';
 import { ActivityService } from '../services/activityService.js';
 import { WorkflowService } from '../services/workflowService.js';
+import { ExamProfileService } from '../services/examProfileService.js';
+import { OfficialInfoService } from '../services/officialInfoService.js';
+import { PerformanceService } from '../services/performanceService.js';
+import { LLMService } from '../services/llmService.js';
+import { InterviewService } from '../services/interviewService.js';
 import path from 'node:path';
 
 const upload = multer({
@@ -35,6 +40,10 @@ apiRouter.get('/status', (req, res) => {
       transport: 'Streamable HTTP',
       status: 'active'
     },
+    ai: {
+      provider: LLMService.getActiveProvider(),
+      is_configured: LLMService.isConfigured()
+    },
     metrics: {
       documents: docs.length,
       tasks: taskStats.total,
@@ -43,6 +52,123 @@ apiRouter.get('/status', (req, res) => {
       schedules: schedules.length
     }
   });
+});
+
+// ==========================================
+// EXAM PROFILES & PERFORMANCE
+// ==========================================
+apiRouter.get('/exams', (req, res) => {
+  try {
+    const profiles = ExamProfileService.getAllProfiles();
+    res.json(profiles);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+apiRouter.get('/performance', (req, res) => {
+  try {
+    const analytics = PerformanceService.analyzePerformance();
+    res.json(analytics);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+apiRouter.get('/official-info', (req, res) => {
+  try {
+    const query = (req.query.query as string) || 'upsc';
+    const info = OfficialInfoService.getOfficialInfo(query);
+    res.json(info);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ==========================================
+// INTERVIEWS
+// ==========================================
+apiRouter.post('/interviews', (req, res) => {
+  try {
+    const session = InterviewService.createSession(req.body);
+    res.status(201).json(session);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+apiRouter.get('/interviews', (req, res) => {
+  try {
+    const sessions = InterviewService.listSessions();
+    res.json(sessions);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+apiRouter.get('/interviews/:id', (req, res) => {
+  try {
+    const session = InterviewService.getSession(req.params.id);
+    if (!session) {
+      res.status(404).json({ error: 'Interview session not found.' });
+      return;
+    }
+    res.json(session);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+apiRouter.post('/interviews/:id/answer', (req, res) => {
+  try {
+    const { question_id, answer_text, submitted_code, duration_seconds } = req.body;
+    if (!question_id || !answer_text) {
+      res.status(400).json({ error: 'question_id and answer_text are required.' });
+      return;
+    }
+    const result = InterviewService.submitAndEvaluateAnswer({
+      sessionId: req.params.id,
+      questionId: question_id,
+      answerText: answer_text,
+      submittedCode: submitted_code,
+      durationSeconds: duration_seconds ? Number(duration_seconds) : 0
+    });
+    res.json(result);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+apiRouter.post('/interviews/:id/next', (req, res) => {
+  try {
+    const question = InterviewService.generateNextQuestion(req.params.id);
+    res.json({ question, completed: !question });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+apiRouter.post('/interviews/:id/complete', (req, res) => {
+  try {
+    const report = InterviewService.completeSession(req.params.id);
+    res.json(report);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+apiRouter.post('/interviews/analyze-resume', (req, res) => {
+  try {
+    const { resume_text, job_description } = req.body;
+    if (!resume_text) {
+      res.status(400).json({ error: 'resume_text is required.' });
+      return;
+    }
+    const analysis = InterviewService.analyzeResume(resume_text, job_description);
+    res.json(analysis);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 // ==========================================

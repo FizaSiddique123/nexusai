@@ -195,5 +195,116 @@ export interface ChatMessage {
   proposed_schedule?: ScheduleItem;
   generated_quiz_id?: string;
   workflow_id?: string;
+  interview_session_id?: string;
 }
+
+export type InterviewCategory = 'technical' | 'hr' | 'behavioral' | 'managerial' | 'role_specific' | 'competitive_exam';
+export type InterviewDifficulty = 'easy' | 'medium' | 'hard';
+export type InterviewMode = 'practice' | 'mock';
+export type InterviewStatus = 'in_progress' | 'completed' | 'paused' | 'abandoned';
+
+export interface InterviewRubricBreakdown {
+  technical_correctness?: number; // 0-100
+  conceptual_understanding?: number;
+  problem_solving?: number;
+  communication?: number;
+  structure_star?: number;
+  evidence_and_examples?: number;
+}
+
+export interface InterviewEvaluation {
+  id: string;
+  answer_id: string;
+  question_id: string;
+  session_id: string;
+  score: number;
+  rubric_breakdown: InterviewRubricBreakdown;
+  strengths: string[];
+  missing_concepts: string[];
+  improvement_suggestions: string[];
+  follow_up_question?: string;
+  strong_example_answer?: string;
+  created_at: string;
+}
+
+export interface InterviewAnswer {
+  id: string;
+  question_id: string;
+  session_id: string;
+  answer_text: string;
+  submitted_code?: string;
+  duration_seconds: number;
+  created_at: string;
+  evaluation?: InterviewEvaluation;
+}
+
+export interface InterviewQuestion {
+  id: string;
+  session_id: string;
+  question_index: number;
+  question_text: string;
+  question_type: 'technical_dsa' | 'system_design' | 'dbms_os_networks' | 'hr_behavioral' | 'resume_project' | 'role_scenario';
+  expected_concepts: string[];
+  starter_code?: string;
+  hints?: string[];
+  sample_strong_answer?: string;
+  created_at: string;
+  answer?: InterviewAnswer;
+}
+
+export interface InterviewReport {
+  id: string;
+  session_id: string;
+  overall_score: number;
+  readiness_assessment: string;
+  category_scores: Record<string, number>;
+  top_strengths: string[];
+  critical_weaknesses: string[];
+  recommended_preparation: string[];
+  created_at: string;
+}
+
+export interface InterviewSession {
+  id: string;
+  title: string;
+  category: InterviewCategory;
+  target_company?: string;
+  target_role: string;
+  experience_level: 'beginner' | 'intermediate' | 'advanced';
+  programming_language?: string;
+  difficulty: InterviewDifficulty;
+  mode: InterviewMode;
+  status: InterviewStatus;
+  resume_doc_id?: string;
+  job_description?: string;
+  current_question_index: number;
+  total_questions: number;
+  overall_score?: number;
+  summary?: string;
+  created_at: string;
+  updated_at: string;
+  questions?: InterviewQuestion[];
+  report?: InterviewReport;
+}
+
+export interface ResumeAnalysisResult {
+  candidate_name?: string;
+  education: string[];
+  skills: string[];
+  projects: Array<{
+    title: string;
+    description: string;
+    tech_stack?: string[];
+  }>;
+  experience: string[];
+  certifications: string[];
+  job_description_match?: {
+    match_score: number; // 0-100
+    matching_skills: string[];
+    missing_skills: string[];
+    recommended_study_topics: string[];
+    generated_project_questions: string[];
+  };
+}
+
 

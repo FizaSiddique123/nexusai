@@ -11,6 +11,7 @@ import { QuizService } from '../services/quizService.js';
 import { PreferenceService } from '../services/preferenceService.js';
 import { ActivityService } from '../services/activityService.js';
 import { WorkflowService } from '../services/workflowService.js';
+import { InterviewService } from '../services/interviewService.js';
 
 export function createNexusMcpServer() {
   const mcp = new McpServer(
@@ -795,6 +796,247 @@ export function createNexusMcpServer() {
         return {
           isError: true,
           content: [{ type: 'text', text: `Failed to retrieve workflow status: ${err.message}` }]
+        };
+      }
+    }
+  );
+
+  // -------------------------------------------------------------
+  // INTERVIEW PREPARATION & EVALUATION TOOLS
+  // -------------------------------------------------------------
+
+  // Tool 18: create_interview_session
+  mcp.tool(
+    'create_interview_session',
+    'Start an interactive technical, HR, behavioral, or role-specific mock interview session with transparent rubrics.',
+    {
+      category: z.enum(['technical', 'hr', 'behavioral', 'managerial', 'role_specific']).optional().describe('Interview category'),
+      target_company: z.string().optional().describe('Target company name (e.g. Google, Amazon, Microsoft)'),
+      target_role: z.string().optional().describe('Target job title or internship role (e.g. Software Engineer)'),
+      experience_level: z.enum(['beginner', 'intermediate', 'advanced']).optional().describe('Candidate experience level'),
+      programming_language: z.string().optional().describe('Preferred programming language for coding questions'),
+      difficulty: z.enum(['easy', 'medium', 'hard']).optional().describe('Interview difficulty'),
+      mode: z.enum(['practice', 'mock']).optional().describe('Practice mode allows hints; mock mode simulates live evaluation'),
+      total_questions: z.number().optional().describe('Total number of questions (2 to 10)')
+    },
+    async (params) => {
+      try {
+        const session = InterviewService.createSession(params as any);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                session_id: session.id,
+                title: session.title,
+                category: session.category,
+                target_role: session.target_role,
+                current_question_index: session.current_question_index,
+                total_questions: session.total_questions,
+                first_question: session.questions?.[0]
+              }, null, 2)
+            }
+          ]
+        };
+      } catch (err: any) {
+        return {
+          isError: true,
+          content: [{ type: 'text', text: `Failed to create interview session: ${err.message}` }]
+        };
+      }
+    }
+  );
+
+  // Tool 19: generate_interview_question
+  mcp.tool(
+    'generate_interview_question',
+    'Generate the next adaptive interview question for an active session, considering candidate performance.',
+    {
+      session_id: z.string().describe('Active interview session ID')
+    },
+    async ({ session_id }) => {
+      try {
+        const question = InterviewService.generateNextQuestion(session_id);
+        if (!question) {
+          const report = InterviewService.completeSession(session_id);
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  completed: true,
+                  message: 'Interview session is complete.',
+                  report
+                }, null, 2)
+              }
+            ]
+          };
+        }
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(question, null, 2)
+            }
+          ]
+        };
+      } catch (err: any) {
+        return {
+          isError: true,
+          content: [{ type: 'text', text: `Failed to generate interview question: ${err.message}` }]
+        };
+      }
+    }
+  );
+
+  // Tool 20: submit_interview_answer
+  mcp.tool(
+    'submit_interview_answer',
+    'Submit candidate answer or code for a specific interview question and receive transparent rubric feedback.',
+    {
+      session_id: z.string().describe('Interview session ID'),
+      question_id: z.string().describe('Question ID being answered'),
+      answer_text: z.string().describe('Candidate text response or explanation'),
+      submitted_code: z.string().optional().describe('Candidate code implementation (if applicable)'),
+      duration_seconds: z.number().optional().describe('Time spent answering in seconds')
+    },
+    async ({ session_id, question_id, answer_text, submitted_code, duration_seconds }) => {
+      try {
+        const result = InterviewService.submitAndEvaluateAnswer({
+          sessionId: session_id,
+          questionId: question_id,
+          answerText: answer_text,
+          submittedCode: submitted_code,
+          durationSeconds: duration_seconds
+        });
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                evaluation: result.evaluation,
+                has_next_question: Boolean(result.nextQuestion),
+                next_question: result.nextQuestion,
+                report: result.report
+              }, null, 2)
+            }
+          ]
+        };
+      } catch (err: any) {
+        return {
+          isError: true,
+          content: [{ type: 'text', text: `Failed to submit interview answer: ${err.message}` }]
+        };
+      }
+    }
+  );
+
+  // Tool 21: evaluate_interview_answer
+  mcp.tool(
+    'evaluate_interview_answer',
+    'Retrieve evaluation score, rubric breakdown, strengths, and improvement suggestions for an existing answer.',
+    {
+      session_id: z.string().describe('Interview session ID'),
+      question_id: z.string().describe('Question ID to inspect evaluation for')
+    },
+    async ({ session_id, question_id }) => {
+      try {
+        const session = InterviewService.getSession(session_id);
+        if (!session) throw new Error(`Session ${session_id} not found.`);
+        const q = session.questions?.find(item => item.id === question_id);
+        if (!q || !q.answer || !q.answer.evaluation) {
+          return {
+            content: [{ type: 'text', text: JSON.stringify({ evaluated: false, message: 'Question has not been evaluated yet.' }) }]
+          };
+        }
+        return {
+          content: [{ type: 'text', text: JSON.stringify(q.answer.evaluation, null, 2) }]
+        };
+      } catch (err: any) {
+        return {
+          isError: true,
+          content: [{ type: 'text', text: `Failed to retrieve evaluation: ${err.message}` }]
+        };
+      }
+    }
+  );
+
+  // Tool 22: get_interview_feedback
+  mcp.tool(
+    'get_interview_feedback',
+    'Retrieve strengths, missing concepts, follow-up questions, and model answers for a completed interview question.',
+    {
+      session_id: z.string().describe('Interview session ID')
+    },
+    async ({ session_id }) => {
+      try {
+        const session = InterviewService.getSession(session_id);
+        if (!session) throw new Error(`Session ${session_id} not found.`);
+        const evaluations = session.questions?.filter(q => q.answer?.evaluation).map(q => ({
+          question_text: q.question_text,
+          score: q.answer?.evaluation?.score,
+          strengths: q.answer?.evaluation?.strengths,
+          missing_concepts: q.answer?.evaluation?.missing_concepts,
+          suggestions: q.answer?.evaluation?.improvement_suggestions
+        })) || [];
+
+        return {
+          content: [{ type: 'text', text: JSON.stringify({ session_title: session.title, count: evaluations.length, evaluations }, null, 2) }]
+        };
+      } catch (err: any) {
+        return {
+          isError: true,
+          content: [{ type: 'text', text: `Failed to retrieve interview feedback: ${err.message}` }]
+        };
+      }
+    }
+  );
+
+  // Tool 23: generate_interview_report
+  mcp.tool(
+    'generate_interview_report',
+    'Generate comprehensive final readiness report with category scores, weaknesses, and personalized recommendations.',
+    {
+      session_id: z.string().describe('Interview session ID')
+    },
+    async ({ session_id }) => {
+      try {
+        const report = InterviewService.completeSession(session_id);
+        return {
+          content: [{ type: 'text', text: JSON.stringify(report, null, 2) }]
+        };
+      } catch (err: any) {
+        return {
+          isError: true,
+          content: [{ type: 'text', text: `Failed to generate interview report: ${err.message}` }]
+        };
+      }
+    }
+  );
+
+  // Tool 24: get_interview_history
+  mcp.tool(
+    'get_interview_history',
+    'Retrieve past interview practice and mock sessions with scores and completion statuses.',
+    {},
+    async () => {
+      try {
+        const history = InterviewService.listSessions();
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                count: history.length,
+                sessions: history
+              }, null, 2)
+            }
+          ]
+        };
+      } catch (err: any) {
+        return {
+          isError: true,
+          content: [{ type: 'text', text: `Failed to retrieve interview history: ${err.message}` }]
         };
       }
     }

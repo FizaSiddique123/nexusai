@@ -9,6 +9,7 @@ import { Planner } from './pages/Planner.js';
 import { Quizzes } from './pages/Quizzes.js';
 import { ActivityHistory } from './pages/ActivityHistory.js';
 import { Settings } from './pages/Settings.js';
+import { InterviewPrep } from './pages/InterviewPrep.js';
 import { api } from './services/api.js';
 
 export function App() {
@@ -96,6 +97,8 @@ export function App() {
                   onSendPrompt={handleSendPrompt}
                 />
               )}
+
+              {activeTab === 'interview' && <InterviewPrep />}
 
               {activeTab === 'knowledge' && <KnowledgeBase />}
 

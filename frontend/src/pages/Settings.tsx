@@ -15,7 +15,10 @@ export const Settings: React.FC = () => {
     session_duration_minutes: '45',
     break_duration_minutes: '15',
     daily_max_study_hours: '6',
-    exam_target_date: '2026-10-28'
+    exam_target_date: '2026-10-28',
+    target_exam: 'gate-cs',
+    preparation_level: 'intermediate',
+    explanation_depth: 'exam_oriented'
   });
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -33,7 +36,10 @@ export const Settings: React.FC = () => {
         session_duration_minutes: preferences.session_duration_minutes || '45',
         break_duration_minutes: preferences.break_duration_minutes || '15',
         daily_max_study_hours: preferences.daily_max_study_hours || '6',
-        exam_target_date: preferences.exam_target_date || '2026-10-28'
+        exam_target_date: preferences.exam_target_date || '2026-10-28',
+        target_exam: preferences.target_exam || 'gate-cs',
+        preparation_level: preferences.preparation_level || 'intermediate',
+        explanation_depth: preferences.explanation_depth || 'exam_oriented'
       });
     } catch (err) {
       console.error('Failed to load settings:', err);
@@ -133,17 +139,68 @@ export const Settings: React.FC = () => {
               </div>
             </div>
 
-            <div>
-              <label style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--text-secondary)', display: 'block', marginBottom: '5px' }}>
-                Target exam date
-              </label>
-              <input
-                type="date"
-                className="input-field"
-                value={prefs.exam_target_date}
-                onChange={e => setPrefs({ ...prefs, exam_target_date: e.target.value })}
-                style={{ maxWidth: '240px' }}
-              />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+              <div>
+                <label style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--text-secondary)', display: 'block', marginBottom: '5px' }}>
+                  Target exam date
+                </label>
+                <input
+                  type="date"
+                  className="input-field"
+                  value={prefs.exam_target_date}
+                  onChange={e => setPrefs({ ...prefs, exam_target_date: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--text-secondary)', display: 'block', marginBottom: '5px' }}>
+                  Target examination profile
+                </label>
+                <select
+                  className="input-field"
+                  value={prefs.target_exam}
+                  onChange={e => setPrefs({ ...prefs, target_exam: e.target.value })}
+                >
+                  <option value="gate-cs">GATE (Computer Science & IT)</option>
+                  <option value="upsc-cse">UPSC Civil Services (CSE)</option>
+                  <option value="cat-mba">CAT (Common Admission Test)</option>
+                  <option value="ssc-cgl">SSC Combined Graduate Level (CGL)</option>
+                  <option value="banking-ibps-sbi">Banking (IBPS PO / SBI PO)</option>
+                  <option value="university-cs">University Computer Science & Engineering</option>
+                </select>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+              <div>
+                <label style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--text-secondary)', display: 'block', marginBottom: '5px' }}>
+                  Current preparation level
+                </label>
+                <select
+                  className="input-field"
+                  value={prefs.preparation_level}
+                  onChange={e => setPrefs({ ...prefs, preparation_level: e.target.value })}
+                >
+                  <option value="beginner">Foundational / Beginner</option>
+                  <option value="intermediate">Intermediate / Concept Consolidation</option>
+                  <option value="advanced">Advanced / Mock Tests & Problem Solving</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--text-secondary)', display: 'block', marginBottom: '5px' }}>
+                  Preferred explanation depth
+                </label>
+                <select
+                  className="input-field"
+                  value={prefs.explanation_depth}
+                  onChange={e => setPrefs({ ...prefs, explanation_depth: e.target.value })}
+                >
+                  <option value="exam_oriented">Exam-Oriented (Formulas, Tips & Pitfalls)</option>
+                  <option value="detailed">Comprehensive / Pedagogical Deep Dive</option>
+                  <option value="concise">Concise / Quick Revision</option>
+                </select>
+              </div>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '8px' }}>

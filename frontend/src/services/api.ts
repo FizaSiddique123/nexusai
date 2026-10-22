@@ -7,7 +7,10 @@ import {
   ChatMessage,
   ActivityEvent,
   DocumentSearchResult,
-  WorkflowItem
+  WorkflowItem,
+  InterviewSession,
+  InterviewReport,
+  ResumeAnalysisResult
 } from '../../../shared/src/types.js';
 
 const API_BASE = '/api';
@@ -291,6 +294,75 @@ export const api = {
   }> {
     const res = await fetch(`${API_BASE}/workflows/${id}/verify`);
     if (!res.ok) throw new Error('Failed to verify workflow');
+    return res.json();
+  },
+
+  // ==========================================
+  // INTERVIEW PREPARATION MODULE
+  // ==========================================
+  async createInterview(params: any): Promise<InterviewSession> {
+    const res = await fetch(`${API_BASE}/interviews`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed to create interview session' }));
+      throw new Error(err.error || 'Failed to create interview session');
+    }
+    return res.json();
+  },
+
+  async getInterviews(): Promise<InterviewSession[]> {
+    const res = await fetch(`${API_BASE}/interviews`);
+    if (!res.ok) throw new Error('Failed to fetch interview sessions');
+    return res.json();
+  },
+
+  async getInterview(id: string): Promise<InterviewSession> {
+    const res = await fetch(`${API_BASE}/interviews/${id}`);
+    if (!res.ok) throw new Error('Failed to fetch interview session');
+    return res.json();
+  },
+
+  async submitInterviewAnswer(
+    sessionId: string,
+    data: { question_id: string; answer_text: string; submitted_code?: string; duration_seconds?: number }
+  ): Promise<any> {
+    const res = await fetch(`${API_BASE}/interviews/${sessionId}/answer`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed to submit interview answer' }));
+      throw new Error(err.error || 'Failed to submit interview answer');
+    }
+    return res.json();
+  },
+
+  async nextInterviewQuestion(sessionId: string): Promise<any> {
+    const res = await fetch(`${API_BASE}/interviews/${sessionId}/next`, { method: 'POST' });
+    if (!res.ok) throw new Error('Failed to generate next question');
+    return res.json();
+  },
+
+  async completeInterview(sessionId: string): Promise<InterviewReport> {
+    const res = await fetch(`${API_BASE}/interviews/${sessionId}/complete`, { method: 'POST' });
+    if (!res.ok) throw new Error('Failed to complete interview');
+    return res.json();
+  },
+
+  async analyzeResume(resume_text: string, job_description?: string): Promise<ResumeAnalysisResult> {
+    const res = await fetch(`${API_BASE}/interviews/analyze-resume`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resume_text, job_description })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Failed to analyze resume' }));
+      throw new Error(err.error || 'Failed to analyze resume');
+    }
     return res.json();
   }
 };

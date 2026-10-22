@@ -47,19 +47,19 @@ export const Assistant: React.FC<AssistantProps> = ({
   const [expandedActions, setExpandedActions] = useState<Record<string, boolean>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Suggested Prompts matching Image 2 categories + Nexus AI capabilities
+  // Suggested Prompts for Universal Academic & Exam Preparation
   const categoryPills = [
-    { label: 'Coding', icon: <Code2 size={13} />, prompt: 'Analyse my notes for programming and networking algorithms.' },
-    { label: 'Cooking', icon: <Utensils size={13} />, prompt: 'Plan my study schedule with healthy meal and rest intervals.' },
-    { label: 'Health', icon: <Heart size={13} />, prompt: 'Check my revision sessions to ensure proper mental wellness breaks.' },
-    { label: 'Trips', icon: <Briefcase size={13} />, prompt: 'Organise my upcoming tasks and deadlines in a structured timeline.' },
-    { label: 'Troubleshoot', icon: <Wrench size={13} />, prompt: 'Troubleshoot and explain TCP 3-way handshake vs UDP flow control.' }
+    { label: 'Coding & DSA', icon: <Code2 size={13} />, prompt: 'Explain binary search with code and its time complexity.' },
+    { label: 'DBMS & OS', icon: <Wrench size={13} />, prompt: 'Explain normalization in DBMS with an example.' },
+    { label: 'Competitive Exams', icon: <Briefcase size={13} />, prompt: 'Explain the role of the President of India for UPSC preparation.' },
+    { label: 'Quantitative Aptitude', icon: <Sparkles size={13} />, prompt: 'Solve a sample quantitative aptitude problem step by step.' },
+    { label: 'Smart Notes RAG', icon: <HelpCircle size={13} />, prompt: 'I have an exam on Friday. Analyze my uploaded notes, identify the important topics, create a revision plan, schedule my study sessions, and generate a practice quiz.' }
   ];
 
   const quickStudyPrompts = [
-    'I have an exam on Friday. Analyze my uploaded notes, identify the important topics, create a revision plan, schedule my study sessions, and generate a practice quiz.',
-    'Plan my study sessions for tomorrow with 45-minute blocks.',
-    'Generate a 10-question practice quiz from my notes.'
+    'What is normalization in DBMS? Explain with an example.',
+    'Explain binary search with code and time complexity.',
+    'I have an exam on Friday. Analyze my uploaded notes, identify the important topics, create a revision plan, schedule my study sessions, and generate a practice quiz.'
   ];
 
   useEffect(() => {

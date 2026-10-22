@@ -60,7 +60,14 @@ export async function runMcpIntegrationTests() {
     'submit_quiz_answers',
     'get_quiz_results',
     'save_preference',
-    'retrieve_preferences'
+    'retrieve_preferences',
+    'create_interview_session',
+    'generate_interview_question',
+    'submit_interview_answer',
+    'evaluate_interview_answer',
+    'get_interview_feedback',
+    'generate_interview_report',
+    'get_interview_history'
   ];
 
   for (const toolName of expectedTools) {
@@ -199,6 +206,34 @@ export async function runMcpIntegrationTests() {
   } catch (err: any) {
     console.log('   ✓ Input validation properly rejected invalid enum argument.');
   }
+
+  console.log('14. Testing MCP Tool Call: create_interview_session...');
+  const interviewResult = await client.callTool({
+    name: 'create_interview_session',
+    arguments: {
+      category: 'technical',
+      target_role: 'Full Stack Engineer',
+      difficulty: 'medium',
+      mode: 'practice'
+    }
+  });
+  assert.ok(interviewResult.content && interviewResult.content.length > 0);
+  const parsedInterview = JSON.parse((interviewResult.content[0] as any).text);
+  assert.ok(parsedInterview.session_id);
+  assert.strictEqual(parsedInterview.category, 'technical');
+  assert.ok(parsedInterview.first_question);
+  console.log(`   ✓ create_interview_session returned session ID ${parsedInterview.session_id}`);
+
+  console.log('15. Testing MCP Tool Call: get_interview_history...');
+  const historyResult = await client.callTool({
+    name: 'get_interview_history',
+    arguments: {}
+  });
+  assert.ok(historyResult.content && historyResult.content.length > 0);
+  const parsedHistory = JSON.parse((historyResult.content[0] as any).text);
+  assert.ok(Array.isArray(parsedHistory.sessions));
+  assert.ok(parsedHistory.count >= 1);
+  console.log(`   ✓ get_interview_history returned ${parsedHistory.count} sessions.`);
 
   // Cleanup
   await client.close();

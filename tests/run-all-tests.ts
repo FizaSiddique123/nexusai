@@ -2,6 +2,8 @@ import { runUnitTests } from './unit/services.test.js';
 import { runFailureCaseTests } from './unit/failure-cases.test.js';
 import { runMcpIntegrationTests } from './integration/mcp.test.js';
 import { runE2EDemoWorkflow } from './e2e/demo-workflow.test.js';
+import { runExamMentorTests } from './unit/exam-mentor.test.js';
+import { runInterviewTests } from './unit/interview.test.js';
 
 async function main() {
   console.log('========================================================');
@@ -14,6 +16,8 @@ async function main() {
     await runUnitTests();
     await runFailureCaseTests();
     await runMcpIntegrationTests();
+    await runExamMentorTests();
+    await runInterviewTests();
     await runE2EDemoWorkflow();
 
     const elapsed = ((Date.now() - start) / 1000).toFixed(2);

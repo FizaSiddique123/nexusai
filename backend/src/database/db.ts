@@ -165,6 +165,85 @@ export function initDatabase() {
       completed_at TEXT,
       FOREIGN KEY (workflow_id) REFERENCES workflows(id) ON DELETE CASCADE
     );
+
+    CREATE TABLE IF NOT EXISTS interview_sessions (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      title TEXT NOT NULL,
+      category TEXT NOT NULL, -- technical, hr, behavioral, managerial, role_specific
+      target_company TEXT,
+      target_role TEXT NOT NULL,
+      experience_level TEXT NOT NULL, -- beginner, intermediate, advanced
+      programming_language TEXT,
+      difficulty TEXT NOT NULL, -- easy, medium, hard
+      mode TEXT NOT NULL DEFAULT 'practice', -- practice, mock
+      status TEXT NOT NULL DEFAULT 'in_progress', -- in_progress, completed, paused, abandoned
+      resume_doc_id TEXT,
+      job_description TEXT,
+      current_question_index INTEGER DEFAULT 0,
+      total_questions INTEGER DEFAULT 5,
+      overall_score REAL,
+      summary TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS interview_questions (
+      id TEXT PRIMARY KEY,
+      session_id TEXT NOT NULL,
+      question_index INTEGER NOT NULL,
+      question_text TEXT NOT NULL,
+      question_type TEXT NOT NULL, -- technical_dsa, system_design, dbms_os_networks, hr_behavioral, resume_project, role_scenario
+      expected_concepts TEXT NOT NULL, -- JSON array
+      starter_code TEXT,
+      hints TEXT, -- JSON array
+      sample_strong_answer TEXT,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (session_id) REFERENCES interview_sessions(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS interview_answers (
+      id TEXT PRIMARY KEY,
+      question_id TEXT NOT NULL,
+      session_id TEXT NOT NULL,
+      answer_text TEXT NOT NULL,
+      submitted_code TEXT,
+      duration_seconds INTEGER DEFAULT 0,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (question_id) REFERENCES interview_questions(id) ON DELETE CASCADE,
+      FOREIGN KEY (session_id) REFERENCES interview_sessions(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS interview_evaluations (
+      id TEXT PRIMARY KEY,
+      answer_id TEXT NOT NULL,
+      question_id TEXT NOT NULL,
+      session_id TEXT NOT NULL,
+      score REAL NOT NULL, -- 0 - 100
+      rubric_breakdown TEXT NOT NULL, -- JSON: technical_correctness, conceptual_understanding, problem_solving, communication, structure_star, evidence
+      strengths TEXT NOT NULL, -- JSON array
+      missing_concepts TEXT NOT NULL, -- JSON array
+      improvement_suggestions TEXT NOT NULL, -- JSON array
+      follow_up_question TEXT,
+      strong_example_answer TEXT,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (answer_id) REFERENCES interview_answers(id) ON DELETE CASCADE,
+      FOREIGN KEY (question_id) REFERENCES interview_questions(id) ON DELETE CASCADE,
+      FOREIGN KEY (session_id) REFERENCES interview_sessions(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS interview_reports (
+      id TEXT PRIMARY KEY,
+      session_id TEXT NOT NULL UNIQUE,
+      overall_score REAL NOT NULL,
+      readiness_assessment TEXT NOT NULL,
+      category_scores TEXT NOT NULL, -- JSON
+      top_strengths TEXT NOT NULL, -- JSON array
+      critical_weaknesses TEXT NOT NULL, -- JSON array
+      recommended_preparation TEXT NOT NULL, -- JSON array
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (session_id) REFERENCES interview_sessions(id) ON DELETE CASCADE
+    );
   `);
 
   // Safe migrations for enriched quiz question fields
@@ -172,6 +251,7 @@ export function initDatabase() {
   try { db.exec('ALTER TABLE quiz_questions ADD COLUMN topic TEXT;'); } catch {}
   try { db.exec('ALTER TABLE quiz_questions ADD COLUMN difficulty TEXT;'); } catch {}
   try { db.exec('ALTER TABLE chat_messages ADD COLUMN workflow_id TEXT;'); } catch {}
+  try { db.exec('ALTER TABLE interview_sessions ADD COLUMN user_id TEXT;'); } catch {}
 
   // Seed default preferences if not present
   const defaultPrefs = [
@@ -181,7 +261,10 @@ export function initDatabase() {
     { key: 'break_duration_minutes', value: '15' },
     { key: 'daily_max_study_hours', value: '6' },
     { key: 'theme', value: 'dark' },
-    { key: 'exam_target_date', value: new Date(Date.now() + 86400000 * 7).toISOString().split('T')[0] }
+    { key: 'exam_target_date', value: new Date(Date.now() + 86400000 * 7).toISOString().split('T')[0] },
+    { key: 'target_exam', value: 'gate-cs' },
+    { key: 'preparation_level', value: 'intermediate' },
+    { key: 'explanation_depth', value: 'exam_oriented' }
   ];
 
   const checkPref = db.prepare('SELECT key FROM user_preferences WHERE key = ?');
@@ -198,4 +281,5 @@ export function initDatabase() {
   console.log(`[Database] Initialized SQLite database with FTS5 at: ${dbPath}`);
 }
 
+export const getDatabase = () => db;
 export { db, uploadsDir, dataDir };
