@@ -757,7 +757,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onSendPrompt
           <div style={{ display: 'flex', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
             <div style={{ background: 'rgba(255, 255, 255, 0.05)', padding: '8px 12px', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
               <div style={{ fontSize: '0.7rem', color: '#948fa3' }}>Completed Sessions</div>
-              <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#38bdf8' }}>{interviews.length}</div>
+              <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#c084fc' }}>{interviews.length}</div>
             </div>
             <div style={{ background: 'rgba(255, 255, 255, 0.05)', padding: '8px 12px', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
               <div style={{ fontSize: '0.7rem', color: '#948fa3' }}>Average Score</div>
@@ -775,7 +775,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onSendPrompt
             <button
               type="button"
               className="overview-btn-action"
-              style={{ background: 'linear-gradient(135deg, #0284c7, #2563eb)' }}
+              style={{ background: 'linear-gradient(135deg, #7c3aed, #9333ea)' }}
               onClick={() => setActiveTab('interview')}
             >
               <Briefcase size={15} />

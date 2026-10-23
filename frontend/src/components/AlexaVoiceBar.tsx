@@ -20,8 +20,8 @@ export const AlexaVoiceBar: React.FC<AlexaVoiceBarProps> = ({ onExecutePrompt })
   return (
     <div
       style={{
-        background: 'linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%)',
-        border: '1px solid rgba(16, 185, 129, 0.25)',
+        background: 'linear-gradient(90deg, rgba(124, 58, 237, 0.15) 0%, rgba(168, 85, 247, 0.12) 100%)',
+        border: '1px solid rgba(139, 92, 246, 0.3)',
         borderRadius: 'var(--radius-lg)',
         padding: '16px 20px',
         marginBottom: '24px',
@@ -30,7 +30,7 @@ export const AlexaVoiceBar: React.FC<AlexaVoiceBarProps> = ({ onExecutePrompt })
         justifyContent: 'space-between',
         flexWrap: 'wrap',
         gap: '16px',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)'
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.35)'
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1, minWidth: '300px' }}>
@@ -39,22 +39,22 @@ export const AlexaVoiceBar: React.FC<AlexaVoiceBarProps> = ({ onExecutePrompt })
             width: '42px',
             height: '42px',
             borderRadius: '50%',
-            background: 'var(--accent-gradient)',
+            background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 0 16px rgba(16, 185, 129, 0.4)',
+            boxShadow: '0 0 16px rgba(168, 85, 247, 0.45)',
             flexShrink: 0
           }}
         >
-          <Volume2 size={20} color="#051512" />
+          <Volume2 size={20} color="#ffffff" />
         </div>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-emerald)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Alexa+ Voice Agent Simulation
             </span>
-            <span style={{ fontSize: '0.7rem', background: 'rgba(6, 182, 212, 0.2)', color: 'var(--accent-teal)', padding: '1px 6px', borderRadius: '4px' }}>
+            <span style={{ fontSize: '0.7rem', background: 'rgba(168, 85, 247, 0.2)', color: 'var(--accent-electric)', padding: '1px 6px', borderRadius: '4px' }}>
               Amazon Hackathon 2026
             </span>
           </div>
@@ -84,7 +84,7 @@ export const AlexaVoiceBar: React.FC<AlexaVoiceBarProps> = ({ onExecutePrompt })
             </>
           ) : (
             <>
-              <Play size={16} fill="#041014" />
+              <Play size={16} fill="#ffffff" color="#ffffff" />
               <span>Run Primary Hackathon Demo</span>
               <ArrowRight size={15} />
             </>

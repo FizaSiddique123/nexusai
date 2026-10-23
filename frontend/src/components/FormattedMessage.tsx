@@ -47,13 +47,13 @@ export const FormattedMessage: React.FC<FormattedMessageProps> = ({
           <code
             key={idx}
             style={{
-              background: 'rgba(56, 189, 248, 0.15)',
-              color: '#38bdf8',
+              background: 'rgba(168, 85, 247, 0.15)',
+              color: '#c084fc',
               padding: '2px 6px',
               borderRadius: '4px',
               fontFamily: 'Consolas, Monaco, "Courier New", monospace',
               fontSize: '0.84em',
-              border: '1px solid rgba(56, 189, 248, 0.25)'
+              border: '1px solid rgba(168, 85, 247, 0.25)'
             }}
           >
             {part.slice(1, -1)}
@@ -116,14 +116,14 @@ export const FormattedMessage: React.FC<FormattedMessageProps> = ({
             padding: '7px 14px',
             marginBottom: '12px',
             borderRadius: '9999px',
-            color: '#7dd3fc',
+            color: '#d8b4fe',
             fontSize: '0.84rem',
             fontWeight: 600,
             letterSpacing: '0.02em',
             boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3), inset 0 1px 1.5px rgba(255, 255, 255, 0.25)'
           }}
         >
-          <Sparkles size={15} color="#38bdf8" />
+          <Sparkles size={15} color="#c084fc" />
           <span>Grounded Findings from Your Documents</span>
         </div>
       );
@@ -138,7 +138,7 @@ export const FormattedMessage: React.FC<FormattedMessageProps> = ({
           key={`divider-${i}`}
           style={{
             height: '1px',
-            background: 'linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.4), transparent)',
+            background: 'linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.35), transparent)',
             margin: '14px 0',
             border: 'none'
           }}
@@ -208,7 +208,7 @@ export const FormattedMessage: React.FC<FormattedMessageProps> = ({
           style={{
             fontSize: '1.02rem',
             fontWeight: 600,
-            color: '#38bdf8',
+            color: '#c084fc',
             margin: '16px 0 8px 0',
             display: 'flex',
             alignItems: 'center',
@@ -216,7 +216,7 @@ export const FormattedMessage: React.FC<FormattedMessageProps> = ({
             letterSpacing: '0.01em'
           }}
         >
-          <Sparkles size={15} color="#38bdf8" />
+          <Sparkles size={15} color="#c084fc" />
           <span>{renderInlineFormatted(headingText)}</span>
         </div>
       );
@@ -232,7 +232,7 @@ export const FormattedMessage: React.FC<FormattedMessageProps> = ({
           style={{
             fontSize: '0.925rem',
             fontWeight: 600,
-            color: '#93c5fd',
+            color: '#d8b4fe',
             margin: '12px 0 6px 0'
           }}
         >
@@ -265,8 +265,8 @@ export const FormattedMessage: React.FC<FormattedMessageProps> = ({
             borderRadius: '16px',
             background: isNotice
               ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(180, 83, 9, 0.08) 100%)'
-              : 'linear-gradient(135deg, rgba(14, 38, 100, 0.45) 0%, rgba(6, 20, 60, 0.65) 100%)',
-            borderLeft: isNotice ? '4px solid #f59e0b' : '4px solid #38bdf8',
+              : 'linear-gradient(135deg, rgba(46, 28, 88, 0.5) 0%, rgba(24, 15, 50, 0.7) 100%)',
+            borderLeft: isNotice ? '4px solid #f59e0b' : '4px solid #a855f7',
             borderTop: '1.5px solid rgba(255, 255, 255, 0.28)',
             borderRight: '1px solid rgba(255, 255, 255, 0.14)',
             borderBottom: '1px solid rgba(255, 255, 255, 0.14)',
@@ -279,8 +279,8 @@ export const FormattedMessage: React.FC<FormattedMessageProps> = ({
           {/* Header row if parsed title exists */}
           {parsed.title ? (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.12)', paddingBottom: '8px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#38bdf8', fontWeight: 600, fontSize: '0.9rem' }}>
-                <BookOpen size={16} color="#38bdf8" />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#c084fc', fontWeight: 600, fontSize: '0.9rem' }}>
+                <BookOpen size={16} color="#c084fc" />
                 <span>{parsed.title}</span>
               </div>
               {parsed.page && (
@@ -298,7 +298,7 @@ export const FormattedMessage: React.FC<FormattedMessageProps> = ({
               )}
             </div>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: isNotice ? '#f59e0b' : '#38bdf8', fontSize: '0.82rem', fontWeight: 600 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: isNotice ? '#f59e0b' : '#c084fc', fontSize: '0.82rem', fontWeight: 600 }}>
               {isNotice ? <AlertCircle size={15} /> : <Info size={15} />}
               <span>{isNotice ? 'Important Notice' : 'Grounded Excerpt'}</span>
             </div>
@@ -337,14 +337,14 @@ export const FormattedMessage: React.FC<FormattedMessageProps> = ({
             gap: '7px',
             padding: '6px 14px',
             borderRadius: '9999px',
-            color: '#7dd3fc',
+            color: '#d8b4fe',
             fontSize: '0.8rem',
             fontWeight: 500,
             margin: '4px 0 12px 0',
             boxShadow: '0 4px 14px rgba(0, 0, 0, 0.3), inset 0 1px 1.5px rgba(255, 255, 255, 0.25)'
           }}
         >
-          <FileText size={14} color="#38bdf8" />
+          <FileText size={14} color="#c084fc" />
           <span>{renderInlineFormatted(cleanCitation)}</span>
         </div>
       );
@@ -376,7 +376,7 @@ export const FormattedMessage: React.FC<FormattedMessageProps> = ({
             marginTop: '16px',
             padding: '16px 20px',
             borderRadius: '18px',
-            background: 'linear-gradient(135deg, rgba(20, 48, 120, 0.45) 0%, rgba(8, 24, 70, 0.65) 100%)',
+            background: 'linear-gradient(135deg, rgba(46, 28, 88, 0.5) 0%, rgba(24, 15, 50, 0.7) 100%)',
             border: '1px solid rgba(255, 255, 255, 0.16)',
             borderTop: '1.5px solid rgba(255, 255, 255, 0.35)',
             boxShadow: '0 16px 40px rgba(0, 0, 0, 0.45), inset 0 1.5px 2px rgba(255, 255, 255, 0.25)',
@@ -385,8 +385,8 @@ export const FormattedMessage: React.FC<FormattedMessageProps> = ({
             gap: '12px'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#93c5fd', fontWeight: 600, fontSize: '0.9rem' }}>
-            <Sparkles size={16} color="#38bdf8" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d8b4fe', fontWeight: 600, fontSize: '0.9rem' }}>
+            <Sparkles size={16} color="#c084fc" />
             <span>Suggested Next Actions</span>
           </div>
 
@@ -420,9 +420,9 @@ export const FormattedMessage: React.FC<FormattedMessageProps> = ({
                 cursor: onActionClick ? 'pointer' : 'default'
               }}
             >
-              <Calendar size={14} color="#60a5fa" />
+              <Calendar size={14} color="#c084fc" />
               <span>Schedule Study Sessions</span>
-              <ArrowRight size={12} color="#60a5fa" />
+              <ArrowRight size={12} color="#c084fc" />
             </button>
 
             <button
@@ -483,8 +483,8 @@ export const FormattedMessage: React.FC<FormattedMessageProps> = ({
                   width: '6px',
                   height: '6px',
                   borderRadius: '50%',
-                  background: '#38bdf8',
-                  boxShadow: '0 0 8px rgba(56, 189, 248, 0.95)',
+                  background: '#a855f7',
+                  boxShadow: '0 0 8px rgba(168, 85, 247, 0.95)',
                   display: 'inline-block',
                   flexShrink: 0,
                   marginTop: '8px'

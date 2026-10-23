@@ -219,8 +219,8 @@ export const Assistant: React.FC<AssistantProps> = ({
                 width: '8px',
                 height: '8px',
                 borderRadius: '50%',
-                backgroundColor: '#38bdf8',
-                boxShadow: '0 0 10px #38bdf8'
+                backgroundColor: '#c084fc',
+                boxShadow: '0 0 10px #c084fc'
               }}
             />
             <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#f8fafc' }}>
@@ -237,7 +237,7 @@ export const Assistant: React.FC<AssistantProps> = ({
                 fontSize: '0.785rem'
               }}
             >
-              <Sparkles size={13} color="#38bdf8" />
+              <Sparkles size={13} color="#c084fc" />
               <span>Hero View</span>
             </button>
 
@@ -249,7 +249,7 @@ export const Assistant: React.FC<AssistantProps> = ({
                 fontSize: '0.785rem'
               }}
             >
-              <Mic size={13} color="#38bdf8" />
+              <Mic size={13} color="#c084fc" />
               <span>Simulate Alexa+ Voice</span>
             </button>
 
@@ -385,10 +385,10 @@ export const Assistant: React.FC<AssistantProps> = ({
                 style={{
                   padding: '9px 22px',
                   fontSize: '0.825rem',
-                  color: '#93c5fd'
+                  color: '#d8b4fe'
                 }}
               >
-                <Sparkles size={14} color="#38bdf8" />
+                <Sparkles size={14} color="#c084fc" />
                 <span>Run Hackathon Primary Scenario: Note Analysis, Revision Plan & Quiz</span>
               </button>
             </div>
@@ -426,8 +426,8 @@ export const Assistant: React.FC<AssistantProps> = ({
                       height: '36px',
                       borderRadius: '50%',
                       overflow: 'hidden',
-                      border: '1.5px solid rgba(56, 189, 248, 0.5)',
-                      boxShadow: '0 0 14px rgba(56, 189, 248, 0.45)',
+                      border: '1.5px solid rgba(168, 85, 247, 0.5)',
+                      boxShadow: '0 0 14px rgba(168, 85, 247, 0.45)',
                       flexShrink: 0,
                       marginTop: '2px'
                     }}
@@ -491,7 +491,7 @@ export const Assistant: React.FC<AssistantProps> = ({
                         >
                           {msg.tool_invocations.map((t, idx) => (
                             <div key={idx} style={{ fontSize: '0.785rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <Check size={13} color="#38bdf8" />
+                              <Check size={13} color="#c084fc" />
                               <span style={{ fontWeight: 600, color: '#f8fafc' }}>
                                 {formatActionName(t.tool)}:
                               </span>
@@ -511,13 +511,13 @@ export const Assistant: React.FC<AssistantProps> = ({
                       className="nexus-card"
                       style={{
                         marginTop: '16px',
-                        border: '1px solid rgba(56, 189, 248, 0.45)',
+                        border: '1px solid rgba(168, 85, 247, 0.45)',
                         borderTop: '1.5px solid rgba(255, 255, 255, 0.35)'
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <Calendar size={18} color="#38bdf8" />
+                          <Calendar size={18} color="#c084fc" />
                           <span style={{ fontWeight: 600, fontSize: '0.95rem', color: '#ffffff' }}>
                             {msg.proposed_schedule.title}
                           </span>
@@ -542,7 +542,7 @@ export const Assistant: React.FC<AssistantProps> = ({
                           >
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                               <Clock size={14} color="#94a3b8" />
-                              <span style={{ fontWeight: 500, color: '#93c5fd' }}>{s.start_time} – {s.end_time}</span>
+                              <span style={{ fontWeight: 500, color: '#d8b4fe' }}>{s.start_time} – {s.end_time}</span>
                               <span style={{ color: s.is_break ? '#fbbf24' : '#f8fafc', fontWeight: s.is_break ? 400 : 500 }}>
                                 {s.title}
                               </span>
@@ -618,14 +618,14 @@ export const Assistant: React.FC<AssistantProps> = ({
                       width: '36px',
                       height: '36px',
                       borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #1e40af, #3b82f6)',
-                      border: '1.5px solid rgba(147, 197, 253, 0.5)',
+                      background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                      border: '1.5px solid rgba(216, 180, 254, 0.5)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0,
                       color: '#ffffff',
-                      boxShadow: '0 0 12px rgba(59, 130, 246, 0.4)'
+                      boxShadow: '0 0 12px rgba(168, 85, 247, 0.4)'
                     }}
                   >
                     <User size={16} />
@@ -643,8 +643,8 @@ export const Assistant: React.FC<AssistantProps> = ({
                     height: '36px',
                     borderRadius: '50%',
                     overflow: 'hidden',
-                    border: '1.5px solid rgba(56, 189, 248, 0.5)',
-                    boxShadow: '0 0 12px rgba(56, 189, 248, 0.4)'
+                    border: '1.5px solid rgba(168, 85, 247, 0.5)',
+                    boxShadow: '0 0 12px rgba(168, 85, 247, 0.4)'
                   }}
                 >
                   <img src="/robot-avatar.jpg" alt="AI" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -653,13 +653,13 @@ export const Assistant: React.FC<AssistantProps> = ({
                   style={{
                     padding: '10px 16px',
                     borderRadius: 'var(--radius-md)',
-                    backgroundColor: 'rgba(8, 26, 72, 0.85)',
-                    border: '1px solid rgba(56, 189, 248, 0.35)',
+                    backgroundColor: 'rgba(26, 18, 48, 0.9)',
+                    border: '1px solid rgba(168, 85, 247, 0.35)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
                     fontSize: '0.85rem',
-                    color: '#38bdf8',
+                    color: '#c084fc',
                     boxShadow: '0 4px 18px rgba(0, 0, 0, 0.3)'
                   }}
                 >
@@ -680,7 +680,7 @@ export const Assistant: React.FC<AssistantProps> = ({
           style={{
             padding: '14px 36px 18px 36px',
             borderTop: '1px solid var(--border-subtle)',
-            background: 'rgba(4, 13, 38, 0.75)',
+            background: 'rgba(13, 9, 22, 0.85)',
             backdropFilter: 'blur(16px)',
             maxWidth: '860px',
             margin: '0 auto',
@@ -719,8 +719,8 @@ export const Assistant: React.FC<AssistantProps> = ({
                 padding: '12px 18px',
                 fontSize: '0.9rem',
                 borderRadius: '9999px',
-                backgroundColor: 'rgba(8, 24, 66, 0.8)',
-                border: '1px solid rgba(59, 130, 246, 0.3)'
+                backgroundColor: 'rgba(26, 19, 44, 0.8)',
+                border: '1px solid rgba(139, 92, 246, 0.25)'
               }}
             />
 

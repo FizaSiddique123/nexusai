@@ -56,8 +56,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <aside
       style={{
         width: '84px',
-        background: 'linear-gradient(180deg, rgba(5, 16, 44, 0.95) 0%, rgba(2, 8, 24, 0.98) 100%)',
-        borderRight: '1px solid rgba(59, 130, 246, 0.22)',
+        background: 'linear-gradient(180deg, rgba(14, 10, 24, 0.98) 0%, rgba(9, 7, 16, 0.99) 100%)',
+        borderRight: '1px solid rgba(139, 92, 246, 0.18)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -79,8 +79,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           height: '52px',
           borderRadius: '50%',
           padding: '2px',
-          background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.6), rgba(37, 99, 235, 0.3))',
-          boxShadow: '0 0 18px rgba(56, 189, 248, 0.35)',
+          background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.7), rgba(124, 58, 237, 0.45))',
+          boxShadow: '0 0 18px rgba(168, 85, 247, 0.4)',
           cursor: 'pointer',
           marginBottom: '38px',
           transition: 'all 0.25s ease',
@@ -90,11 +90,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'scale(1.08)';
-          e.currentTarget.style.boxShadow = '0 0 24px rgba(56, 189, 248, 0.6)';
+          e.currentTarget.style.boxShadow = '0 0 24px rgba(168, 85, 247, 0.7)';
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = 'scale(1)';
-          e.currentTarget.style.boxShadow = '0 0 18px rgba(56, 189, 248, 0.35)';
+          e.currentTarget.style.boxShadow = '0 0 18px rgba(168, 85, 247, 0.4)';
         }}
         title="Nexus AI - Home"
       >
@@ -147,8 +147,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     position: 'absolute',
                     top: '-2px',
                     right: '-2px',
-                    backgroundColor: '#38bdf8',
-                    color: '#03102d',
+                    backgroundColor: '#a855f7',
+                    color: '#ffffff',
                     fontSize: '0.65rem',
                     fontWeight: 700,
                     width: '18px',

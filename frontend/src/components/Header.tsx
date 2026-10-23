@@ -84,7 +84,7 @@ export const Header: React.FC<HeaderProps> = ({
             }}
             title={showHero ? 'Open active conversation' : 'Switch to Hero View'}
           >
-            {showHero ? <MessageSquare size={13} color="#38bdf8" /> : <Sparkles size={13} color="#38bdf8" />}
+            {showHero ? <MessageSquare size={13} color="#c084fc" /> : <Sparkles size={13} color="#c084fc" />}
             <span>{showHero ? 'Chat Session' : 'Hero View'}</span>
           </button>
         )}

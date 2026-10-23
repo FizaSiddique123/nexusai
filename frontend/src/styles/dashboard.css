@@ -974,9 +974,9 @@
 }
 
 .overview-badge-tag.interview {
-  background: rgba(56, 189, 248, 0.15);
-  color: #38bdf8;
-  border-color: rgba(56, 189, 248, 0.25);
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+  border-color: rgba(168, 85, 247, 0.25);
 }
 
 .overview-card-subtitle {
