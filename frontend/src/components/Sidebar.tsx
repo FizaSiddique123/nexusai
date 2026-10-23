@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Home,
   Search,
   Clock,
   LayoutGrid,
@@ -44,10 +45,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
     icon: React.ReactNode;
     badge?: number;
   }> = [
+    { id: 'home', label: 'Overview', icon: <Home size={21} />, badge: metrics?.tasks },
     { id: 'assistant', label: 'AI Assistant', icon: <Search size={21} /> },
     { id: 'interview', label: 'Interview Prep', icon: <Briefcase size={21} /> },
     { id: 'planner', label: 'Planner & Schedule', icon: <Clock size={21} /> },
-    { id: 'home', label: 'Modules & Dashboard', icon: <LayoutGrid size={21} />, badge: metrics?.tasks },
     { id: 'quizzes', label: 'Quiz Studio & Knowledge', icon: <Sparkles size={21} />, badge: metrics?.quizzes },
   ];
 

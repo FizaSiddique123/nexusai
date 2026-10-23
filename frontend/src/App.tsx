@@ -13,7 +13,7 @@ import { InterviewPrep } from './pages/InterviewPrep.js';
 import { api } from './services/api.js';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<NavTab>('assistant');
+  const [activeTab, setActiveTab] = useState<NavTab>('home');
   const [showHero, setShowHero] = useState<boolean>(true);
   const [hasChatMessages, setHasChatMessages] = useState<boolean>(false);
   const [metrics, setMetrics] = useState<{
@@ -72,13 +72,15 @@ export function App() {
 
           {/* Main Content Viewport */}
           <div className="main-content">
-            <Header
-              activeTab={activeTab}
-              onOpenSettings={() => setActiveTab('settings')}
-              showHero={showHero}
-              onToggleHero={() => setShowHero(!showHero)}
-              hasChatMessages={hasChatMessages}
-            />
+            {activeTab !== 'home' && (
+              <Header
+                activeTab={activeTab}
+                onOpenSettings={() => setActiveTab('settings')}
+                showHero={showHero}
+                onToggleHero={() => setShowHero(!showHero)}
+                hasChatMessages={hasChatMessages}
+              />
+            )}
 
             <div className="main-scroll-area">
               {activeTab === 'assistant' && (
