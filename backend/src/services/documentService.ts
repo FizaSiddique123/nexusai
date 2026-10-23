@@ -285,6 +285,19 @@ export class DocumentService {
     };
   }
 
+  static getDocumentChunks(documentId: string): DocumentChunk[] {
+    const chunkStmt = db.prepare('SELECT * FROM document_chunks WHERE document_id = ? ORDER BY chunk_index ASC');
+    const chunks = chunkStmt.all(documentId) as any[];
+    return chunks.map(c => ({
+      id: c.id,
+      document_id: c.document_id,
+      chunk_index: c.chunk_index,
+      page_number: c.page_number,
+      content: c.content,
+      token_count: c.token_count
+    }));
+  }
+
   static deleteDocument(id: string): { success: boolean; id: string } {
     const existing = db.prepare('SELECT filename FROM documents WHERE id = ?').get(id) as any;
     if (!existing) {
@@ -318,13 +331,13 @@ export class DocumentService {
         keyword: 'TCP',
         topic: 'Transport Layer Mechanics & Reliable Delivery',
         explanation: 'Three-way handshake (SYN, SYN-ACK, ACK), sliding window flow control, and TCP reliability vs UDP low-latency real-time performance.',
-        difficulty: 'high' as const
+        difficulty: 'hard' as const
       },
       {
         keyword: 'Subnetting',
         topic: 'IPv4 Addressing, CIDR Subnetting & ARP Resolution',
         explanation: 'Calculation of usable host pools in /24 and /28 subnets, network/broadcast address reservations, and ARP hardware mapping.',
-        difficulty: 'high' as const
+        difficulty: 'hard' as const
       },
       {
         keyword: 'Routing',

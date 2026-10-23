@@ -44,6 +44,7 @@ export async function runE2EDemoWorkflow() {
   const wf = WorkflowService.getWorkflow(response.workflowId);
   assert.ok(wf, 'Workflow record must be present in SQLite');
   assert.strictEqual(wf.status, 'completed', 'Workflow status must be completed');
+  assert.ok(wf.steps, 'Workflow steps must be recorded');
   assert.strictEqual(wf.steps.length, 4, 'Must have recorded 4 distinct steps');
 
   const verification = WorkflowService.verifyWorkflowArtifacts(response.workflowId);

@@ -15,6 +15,7 @@ import { ActivityService } from './activityService.js';
 import crypto from 'node:crypto';
 
 export interface CreateInterviewParams {
+  user_id?: string;
   category?: InterviewCategory;
   target_company?: string;
   target_role?: string;
@@ -433,9 +434,9 @@ Afterward, I set up a pre-commit hook and automated CI test runner to ensure no 
    * Submit student's answer and perform transparent rubric evaluation
    */
   static submitAndEvaluateAnswer(params: {
-    sessionId: string;
-    questionId: string;
-    answerText: string;
+    sessionId?: string;
+    questionId?: string;
+    answerText?: string;
     submittedCode?: string;
     durationSeconds?: number;
     session_id?: string;
@@ -498,7 +499,7 @@ Afterward, I set up a pre-commit hook and automated CI test runner to ensure no 
     insertEval.run(
       evalId,
       answerId,
-      questionId,
+      question.id,
       sessionId,
       evaluation.score,
       JSON.stringify(evaluation.rubric_breakdown),
@@ -527,7 +528,7 @@ Afterward, I set up a pre-commit hook and automated CI test runner to ensure no 
 
     const recordedAnswer: InterviewAnswer = {
       id: answerId,
-      question_id: questionId,
+      question_id: question.id,
       session_id: sessionId,
       answer_text: answerText,
       submitted_code: submittedCode,
@@ -536,7 +537,7 @@ Afterward, I set up a pre-commit hook and automated CI test runner to ensure no 
       evaluation: {
         id: evalId,
         answer_id: answerId,
-        question_id: questionId,
+        question_id: question.id,
         session_id: sessionId,
         score: evaluation.score,
         rubric_breakdown: evaluation.rubric_breakdown,

@@ -4,6 +4,7 @@ import { runMcpIntegrationTests } from './integration/mcp.test.js';
 import { runE2EDemoWorkflow } from './e2e/demo-workflow.test.js';
 import { runExamMentorTests } from './unit/exam-mentor.test.js';
 import { runInterviewTests } from './unit/interview.test.js';
+import { runQaRegressionTests } from './unit/qa-regression.test.js';
 
 async function main() {
   console.log('========================================================');
@@ -18,6 +19,7 @@ async function main() {
     await runMcpIntegrationTests();
     await runExamMentorTests();
     await runInterviewTests();
+    await runQaRegressionTests();
     await runE2EDemoWorkflow();
 
     const elapsed = ((Date.now() - start) / 1000).toFixed(2);

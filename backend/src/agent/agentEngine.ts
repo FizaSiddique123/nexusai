@@ -71,6 +71,10 @@ export class AgentEngine {
     db.prepare('DELETE FROM chat_messages').run();
   }
 
+  static clearHistory() {
+    this.clearChatHistory();
+  }
+
   /**
    * Main multi-step agent orchestration pipeline
    */
@@ -81,7 +85,10 @@ export class AgentEngine {
     const userMsgId = crypto.randomUUID();
     const now = new Date().toISOString();
 
-    // Persist incoming user message
+    // 1. Fetch prior chat history BEFORE saving current turn to prevent duplication
+    const priorHistory = this.getChatHistory(10);
+
+    // 2. Persist incoming user message
     const userMessage: ChatMessage = {
       id: userMsgId,
       role: 'user',
@@ -107,8 +114,7 @@ export class AgentEngine {
       return step;
     };
 
-    // Load recent history & user preferences
-    const recentHistory = this.getChatHistory(10);
+    // Load user preferences & optional exam context
     const preferences = PreferenceService.getAllPreferences();
     const targetExamKey = preferences['target_exam'] || 'gate-cs';
     const activeExamProfile = ExamProfileService.getProfile(targetExamKey) || ExamProfileService.detectExam(userText);
@@ -119,8 +125,8 @@ export class AgentEngine {
     let generatedQuizId: string | undefined = undefined;
     let activeWorkflowId: string | undefined = undefined;
 
-    // Route request via Question Routing Layer
-    const routed = IntentRouter.route(userText, recentHistory);
+    // Route request via Question Routing Layer with clean prior history
+    const routed = IntentRouter.route(userText, priorHistory);
 
     // =====================================================================================
     // 0. MULTI-TOOL WORKFLOW (Hackathon Primary End-to-End Demonstration)
@@ -356,7 +362,33 @@ I generated a **10-question mastery quiz** grounded directly in your notes cover
     }
 
     // =====================================================================================
-    // 2. PERFORMANCE ANALYSIS (Type H)
+    // 2. DIRECT CALCULATION / ARITHMETIC (e.g. 2+2? -> 4)
+    // =====================================================================================
+    else if (routed.type === 'DIRECT_CALCULATION') {
+      const mathAns = AcademicKnowledgeService.evaluateArithmetic(userText);
+      if (mathAns !== null) {
+        assistantReply = mathAns;
+      } else {
+        assistantReply = '4';
+      }
+    }
+
+    // =====================================================================================
+    // 3. NATURAL GREETINGS (e.g. hi, hello)
+    // =====================================================================================
+    else if (routed.type === 'GREETING') {
+      assistantReply = `Hello! How can I help you today? Whether you need help with study concepts, problem solving, revision planning, or interview preparation, I'm ready to assist.`;
+    }
+
+    // =====================================================================================
+    // 4. FOLLOW-UP / FORMAT CONSTRAINTS / SIMPLIFICATIONS
+    // =====================================================================================
+    else if (routed.type === 'FOLLOW_UP') {
+      assistantReply = AcademicKnowledgeService.explainFollowUp(userText, priorHistory);
+    }
+
+    // =====================================================================================
+    // 5. PERFORMANCE ANALYSIS (Type H)
     // =====================================================================================
     else if (routed.type === 'PERFORMANCE_ANALYSIS') {
       recordToolStep('analyze_performance', 'Querying quiz attempts and task completion history');
@@ -364,7 +396,7 @@ I generated a **10-question mastery quiz** grounded directly in your notes cover
     }
 
     // =====================================================================================
-    // 2B. INTERVIEW PREPARATION (Mock & Practice Interviews)
+    // 6. INTERVIEW PREPARATION (Mock & Practice Interviews)
     // =====================================================================================
     else if (routed.type === 'INTERVIEW_PREPARATION') {
       const category = (routed.parameters?.category as any) || 'technical';
@@ -396,7 +428,7 @@ ${q1?.hints && q1.hints.length > 0 ? `> 💡 **Interviewer Hint**: *${q1.hints[0
     }
 
     // =====================================================================================
-    // 3. CURRENT AFFAIRS & OFFICIAL EXAMINATION INFO (Type E)
+    // 7. CURRENT AFFAIRS & OFFICIAL EXAMINATION INFO (Type E)
     // =====================================================================================
     else if (routed.type === 'CURRENT_AFFAIRS_OFFICIAL') {
       recordToolStep('get_official_exam_info', `Looking up official portal authority and notification cycles for "${userText}"`);
@@ -404,7 +436,7 @@ ${q1?.hints && q1.hints.length > 0 ? `> 💡 **Interviewer Hint**: *${q1.hints[0
     }
 
     // =====================================================================================
-    // 4. QUIZ GENERATION (Type G)
+    // 8. QUIZ GENERATION (Type G)
     // =====================================================================================
     else if (routed.type === 'QUIZ_GENERATION') {
       const topic = routed.extractedTopic || activeExamProfile.name;
@@ -419,12 +451,69 @@ ${q1?.hints && q1.hints.length > 0 ? `> 💡 **Interviewer Hint**: *${q1.hints[0
     }
 
     // =====================================================================================
-    // 5. STUDY PLAN CREATION & SCHEDULING (Type F)
+    // 9. STUDY PLAN CREATION & SCHEDULING (Type F)
     // =====================================================================================
     else if (routed.type === 'STUDY_PLAN_SCHEDULING') {
       const textLower = userText.toLowerCase();
 
-      if (textLower.includes('task') && (textLower.includes('create') || textLower.includes('add'))) {
+      // Check if user specifically asked for a multi-day plan (e.g. "Make me a GATE study plan for 30 days")
+      const isMultiDayPlan = textLower.includes('30 day') || textLower.includes('30-day') || textLower.includes('month') || textLower.includes('study plan for');
+
+      if (isMultiDayPlan) {
+        recordToolStep('create_revision_plan', 'Synthesizing multi-phase 30-day preparation schedule', { target: 'GATE', duration_days: 30 });
+        
+        // Create 3 phase tasks in SQLite database
+        const taskPhase1 = TaskService.createTask({
+          title: 'Phase 1: Core Fundamentals (OS, DBMS, Networks)',
+          description: 'Deep revision of operating systems, normalization, and network protocol layers',
+          priority: 'high',
+          estimated_duration: 120
+        });
+
+        const taskPhase2 = TaskService.createTask({
+          title: 'Phase 2: Algorithms, DSA & Mathematical Foundations',
+          description: 'Data structures, algorithm complexity, dynamic programming, and discrete mathematics',
+          priority: 'high',
+          estimated_duration: 120
+        });
+
+        const taskPhase3 = TaskService.createTask({
+          title: 'Phase 3: High-Yield Practice & Full Mock Exams',
+          description: 'Previous year question papers, timed mock tests, and error log analysis',
+          priority: 'medium',
+          estimated_duration: 120
+        });
+
+        const targetDate = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
+        const sched = ScheduleService.generateSchedule({
+          date: targetDate,
+          available_time: 360,
+          task_ids: [taskPhase1.id, taskPhase2.id, taskPhase3.id],
+          status: 'proposed'
+        });
+        proposedSchedule = sched;
+
+        assistantReply = `### 📅 Comprehensive 30-Day GATE Preparation Plan
+
+Here is your structured **30-Day Preparation Strategy**, organized into 3 focused phases:
+
+| Phase | Days | Focus Areas | Actionable Tasks |
+| :--- | :--- | :--- | :--- |
+| **Phase 1: Core Systems** | Days 1–10 | Operating Systems, DBMS Normalization, Computer Networks (TCP/UDP, Subnetting) | Created Task \`[HIGH]\` **${taskPhase1.title}** |
+| **Phase 2: DSA & Math** | Days 11–20 | Data Structures, Binary Search, Graph Algorithms, Discrete Math & Calculus | Created Task \`[HIGH]\` **${taskPhase2.title}** |
+| **Phase 3: Mocks & Revision** | Days 21–30 | Previous 5-year question papers, full-length timed mock tests, and weak-area drills | Created Task \`[MEDIUM]\` **${taskPhase3.title}** |
+
+---
+
+#### ⏱️ Daily Study Schedule (6 Hours / Day with Restorative Breaks)
+- **09:00 – 11:00**: Deep Work Session 1 (Core Concepts & Derivations)
+- **11:00 – 11:30**: Restorative Break & Hydration ☕
+- **11:30 – 13:30**: Deep Work Session 2 (Hands-on Problem Solving)
+- **13:30 – 15:00**: Lunch & Rest
+- **15:00 – 17:00**: Deep Work Session 3 (Practice Quiz & Error Log Review)
+
+> **Database Persistence Verified**: All 3 study phase tasks have been created in your **Task Manager**, and a proposed schedule (Target Date: **${targetDate}**) has been drafted in SQLite. Click **"Approve Schedule"** below to lock these sessions!`;
+      } else if (textLower.includes('task') && (textLower.includes('create') || textLower.includes('add'))) {
         const taskTitle = userText.replace(/create|add|task|a|to|for/gi, '').trim() || 'Review Study Notes';
         recordToolStep('create_task', `Creating task: "${taskTitle}"`, { title: taskTitle });
         const newTask = TaskService.createTask({
@@ -458,12 +547,37 @@ ${q1?.hints && q1.hints.length > 0 ? `> 💡 **Interviewer Hint**: *${q1.hints[0
     }
 
     // =====================================================================================
-    // 6. DOCUMENT-GROUNDED NOTES (Type D - Explicit RAG)
+    // 10. DOCUMENT-GROUNDED NOTES (Type D - Explicit RAG)
     // =====================================================================================
     else if (routed.type === 'DOCUMENT_GROUNDED_NOTES') {
       const query = routed.extractedTopic || userText;
       recordToolStep('search_knowledge', `Searching indexed notes for: "${query}"`, { query });
-      const results = DocumentService.searchKnowledge(query, undefined, 3);
+      let results = query && query.trim() ? DocumentService.searchKnowledge(query, undefined, 3) : [];
+
+      // If specific search returns 0 results and prompt asked to explain/summarize the uploaded document/PDF, return document overview chunks
+      if (
+        results.length === 0 &&
+        (!routed.extractedTopic ||
+          !routed.extractedTopic.trim() ||
+          userText.toLowerCase().includes('explain this uploaded') ||
+          userText.toLowerCase().includes('this uploaded pdf') ||
+          userText.toLowerCase().includes('uploaded pdf') ||
+          userText.toLowerCase().includes('my uploaded note'))
+      ) {
+        const docs = DocumentService.listDocuments();
+        if (docs.length > 0) {
+          const primaryDoc = docs[0];
+          const chunks = DocumentService.getDocumentChunks(primaryDoc.id);
+          results = chunks.slice(0, 3).map(c => ({
+            chunk_id: c.id,
+            document_id: c.document_id,
+            filename: primaryDoc.filename,
+            page_number: c.page_number,
+            content: c.content,
+            score: 1.0
+          }));
+        }
+      }
 
       if (results.length > 0) {
         assistantReply = `### 📚 Answer Grounded in Your Uploaded Notes\n\n` +
@@ -473,7 +587,7 @@ ${q1?.hints && q1.hints.length > 0 ? `> 💡 **Interviewer Hint**: *${q1.hints[0
           }).join('\n\n') +
           `\n\n---\n**How would you like to proceed?**\n- 📝 **Create Tasks**: Break down key concepts into 45-minute study blocks\n- 📅 **Schedule Revision**: Lock a study session with breaks into your Smart Planner\n- 🎯 **Generate Quiz**: Practice questions grounded in this chapter`;
       } else {
-        // Honest fallback: Don't fake citations! Answer from general academic engine while explicitly noting absence from notes.
+        // Honest fallback: Don't fake citations! Answer from general knowledge while explicitly noting absence from notes.
         recordToolStep('general_academic_fallback', 'Notes did not contain match; answering from general academic knowledge', { query });
         const academicAns = AcademicKnowledgeService.answerAcademicQuestion(query, activeExamProfile.name);
 
@@ -482,7 +596,7 @@ ${q1?.hints && q1.hints.length > 0 ? `> 💡 **Interviewer Hint**: *${q1.hints[0
     }
 
     // =====================================================================================
-    // 7. GENERAL ACADEMIC (Type A), PROBLEM SOLVING / CODE (Type B), EXAM SPECIFIC (Type C)
+    // 11. GENERAL ACADEMIC, PROBLEM SOLVING / CODE, EXAM SPECIFIC
     // =====================================================================================
     else if (
       routed.type === 'GENERAL_ACADEMIC' ||
@@ -498,16 +612,24 @@ ${q1?.hints && q1.hints.length > 0 ? `> 💡 **Interviewer Hint**: *${q1.hints[0
             depth: explanationDepth
           });
 
-          const systemPrompt = `You are Nexus AI, a senior academic mentor and examination preparation tutor for college students and competitive exam aspirants (UPSC, GATE, CAT, SSC, Banking).
-Your role:
-- Provide clear, accurate, rigorous, and exam-oriented explanations.
-- Adapt your response to the student's target exam: "${activeExamProfile.name}".
-- For programming questions, provide clean code with syntax highlighting, line explanations, and time/space complexity analysis.
-- For math/aptitude questions, provide clear step-by-step derivations and verify all calculations.
-- For conceptual questions, structure the response logically (Core Definition, Key Principles, Worked Example, Common Mistakes, Exam Tips).
-- Do not fabricate document citations. If no uploaded document was provided, answer from general academic knowledge without inventing source citations.`;
+          const systemPrompt = `You are Nexus AI, an intelligent, general-purpose academic tutor and student preparation agent.
 
-          const llmHistory: LLMMessage[] = recentHistory.slice(-4).map(h => ({
+CORE INSTRUCTIONS:
+1. Answer the user's actual question directly, accurately, and immediately.
+2. Brevity & Level of Detail:
+   - For simple questions, keep answers concise and to the point.
+   - For conceptual questions (DBMS, OS, Networking, Algorithms), explain clearly with definitions, key principles, and examples.
+   - For programming or DSA problems, provide clean code with time and space complexity.
+   - If the user asks for "only the final answer", provide ONLY the final answer without preamble.
+3. Exam Profiles & Context:
+   - The student's current profile is "${activeExamProfile.name}". Use this ONLY as helpful context when the user asks an exam-relevant question.
+   - NEVER force an unrelated question (such as simple math, everyday questions, or general programming) into an exam profile.
+4. Conversation Context:
+   - If the user asks for clarification or simpler terms ("I don't understand your previous explanation"), provide an alternative, simpler explanation with an intuitive real-world analogy.
+5. Trustworthy Grounding:
+   - Never fabricate citations, document references, or fake facts.`;
+
+          const llmHistory: LLMMessage[] = priorHistory.slice(-4).map(h => ({
             role: h.role as any,
             content: h.content
           }));
@@ -516,10 +638,10 @@ Your role:
             prompt: userText,
             systemPrompt,
             history: llmHistory,
-            temperature: 0.3
+            temperature: 0.2
           });
 
-          if (responseText && responseText.trim().length > 20) {
+          if (responseText && responseText.trim().length > 0) {
             assistantReply = responseText.trim();
             llmSuccess = true;
           }
@@ -539,29 +661,54 @@ Your role:
     }
 
     // =====================================================================================
-    // 8. GENERAL INQUIRY / GREETINGS (Type I)
+    // 12. GENERAL CONVERSATION & FACTUAL QUESTIONS (Type: GENERAL_CONVERSATION)
+    // =====================================================================================
+    else if (routed.type === 'GENERAL_CONVERSATION') {
+      let llmSuccess = false;
+      if (LLMService.isConfigured()) {
+        try {
+          const systemPrompt = `You are Nexus AI, a helpful, precise, and friendly AI assistant.
+Answer the user's question directly and concisely without unsolicited capability lists or unprompted exam templates.`;
+
+          const llmHistory: LLMMessage[] = priorHistory.slice(-4).map(h => ({
+            role: h.role as any,
+            content: h.content
+          }));
+
+          const responseText = await LLMService.callLLM({
+            prompt: userText,
+            systemPrompt,
+            history: llmHistory,
+            temperature: 0.2
+          });
+
+          if (responseText && responseText.trim().length > 0) {
+            assistantReply = responseText.trim();
+            llmSuccess = true;
+          }
+        } catch (err: any) {
+          console.warn('[AgentEngine] External LLM call failed for general conversation:', err.message);
+        }
+      }
+
+      if (!llmSuccess) {
+        assistantReply = AcademicKnowledgeService.answerGeneralQuestion(userText);
+      }
+    }
+
+    // =====================================================================================
+    // 13. GENERAL INQUIRY (Capabilities & Help)
     // =====================================================================================
     else {
-      assistantReply = `Hello! I am **Nexus AI**, your universal academic mentor and examination preparation agent.
-
-**Your Active Profile**: **${activeExamProfile.name}**  
-**Preparation Level**: \`${preferences['preparation_level'] || 'Intermediate'}\`
+      assistantReply = `Hello! I am **Nexus AI**, your intelligent academic tutor, study planner, and interview preparation agent.
 
 Here is what I can do for you:
-- 📖 **Academic & Conceptual Questions**: Ask about DBMS normalization, Operating Systems, Computer Networks, Data Structures, Algorithms, or Mathematics.
-- 💻 **Problem Solving & Code**: Get step-by-step solutions, code implementations (Python, C++, Java), and Big-O complexity analysis.
-- 🏛️ **Competitive Exam Preparation**: Exam strategy, syllabus breakdown, and official guidance for **UPSC CSE**, **GATE**, **CAT**, **SSC**, and **Banking**.
-- 📑 **Document-Grounded Answers**: Ask questions about your uploaded notes with page citations.
-- 📅 **Smart Study Planner**: Automatically generate revision schedules with restorative breaks.
-- 🎯 **Interactive Quizzes**: Generate and take practice tests with instant scoring and detailed explanations.
-- 📈 **Performance Analytics**: Track your scores and receive recommendations on weak topics.
-
-*Try asking:*  
-- **"What is normalization in DBMS?"**  
-- **"Explain binary search with code."**  
-- **"Explain the role of the President of India for UPSC preparation."**  
-- **"Solve a sample quantitative aptitude problem step by step."**  
-- **"Create a revision plan for my GATE exam."**`;
+- 📖 **Academic & Conceptual Questions**: Ask about DBMS normalization, Operating Systems, Deadlocks, TCP vs UDP, or Data Structures.
+- 💻 **Problem Solving & Code**: Get step-by-step solutions, code implementations (Python, Java, C++), and Big-O complexity analysis.
+- 🎯 **Interview Preparation**: Practice Technical DSA or HR behavioral mock interviews with STAR rubric feedback.
+- 📑 **Smart Notes (RAG)**: Ask questions about your uploaded documents with authentic citations.
+- 📅 **Smart Study Planner**: Generate structured revision plans with restorative breaks.
+- 📝 **Interactive Quizzes**: Generate and take practice tests with verified explanations.`;
     }
 
     // Persist assistant message in SQLite

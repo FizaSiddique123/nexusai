@@ -76,8 +76,12 @@ export async function runMcpIntegrationTests() {
   }
   console.log(`   ✓ All ${expectedTools.length} required MCP tools verified!`);
 
+  const callMcpTool = async (params: any): Promise<any> => {
+    return (await client.callTool(params)) as any;
+  };
+
   console.log('3. Testing MCP Tool Call: create_task...');
-  const createResult = await client.callTool({
+  const createResult = await callMcpTool({
     name: 'create_task',
     arguments: {
       title: 'MCP Integration Task',
@@ -92,7 +96,7 @@ export async function runMcpIntegrationTests() {
   console.log('   ✓ create_task executed successfully.');
 
   console.log('4. Testing MCP Tool Call: get_tasks...');
-  const getTasksResult = await client.callTool({
+  const getTasksResult = await callMcpTool({
     name: 'get_tasks',
     arguments: { status: 'all' }
   });
@@ -101,7 +105,7 @@ export async function runMcpIntegrationTests() {
   console.log(`   ✓ get_tasks returned ${parsedTasks.count} tasks.`);
 
   console.log('5. Testing MCP Tool Call: search_knowledge...');
-  const searchResult = await client.callTool({
+  const searchResult = await callMcpTool({
     name: 'search_knowledge',
     arguments: { query: 'OSI TCP' }
   });
@@ -110,7 +114,7 @@ export async function runMcpIntegrationTests() {
   console.log(`   ✓ search_knowledge returned ${parsedSearch.count} results.`);
 
   console.log('6. Testing MCP Tool B: extract_important_topics...');
-  const topicsResult = await client.callTool({
+  const topicsResult = await callMcpTool({
     name: 'extract_important_topics',
     arguments: { query: 'OSI TCP UDP', limit: 3 }
   });
@@ -120,7 +124,7 @@ export async function runMcpIntegrationTests() {
   console.log(`   ✓ extract_important_topics returned ${parsedTopics.count} grounded topics with source citations.`);
 
   console.log('7. Testing MCP Tool C: create_revision_plan...');
-  const planResult = await client.callTool({
+  const planResult = await callMcpTool({
     name: 'create_revision_plan',
     arguments: { exam_date: 'Friday', available_time_minutes: 240, topics: ['OSI Model', 'TCP/IP', 'Subnetting'] }
   });
@@ -130,7 +134,7 @@ export async function runMcpIntegrationTests() {
   console.log(`   ✓ create_revision_plan synthesized plan for ${parsedPlan.plan.exam_date} with ${parsedPlan.plan.ordered_topics.length} blocks.`);
 
   console.log('8. Testing MCP Tool D: schedule_study_sessions...');
-  const sessionsResult = await client.callTool({
+  const sessionsResult = await callMcpTool({
     name: 'schedule_study_sessions',
     arguments: {
       date: '2026-10-25',
@@ -147,7 +151,7 @@ export async function runMcpIntegrationTests() {
   console.log('   ✓ schedule_study_sessions saved sessions with 0 conflicts.');
 
   console.log('9. Testing MCP Tool E: generate_quiz...');
-  const quizToolResult = await client.callTool({
+  const quizToolResult = await callMcpTool({
     name: 'generate_quiz',
     arguments: { topic_or_doc_id: 'Computer Networks', question_count: 5, difficulty: 'medium' }
   });
@@ -157,7 +161,7 @@ export async function runMcpIntegrationTests() {
   console.log('   ✓ generate_quiz generated grounded quiz.');
 
   console.log('10. Testing MCP Tool F: get_workflow_status...');
-  const wfStatusNotFound = await client.callTool({
+  const wfStatusNotFound = await callMcpTool({
     name: 'get_workflow_status',
     arguments: { workflow_id: 'non-existent-id' }
   });
@@ -165,7 +169,7 @@ export async function runMcpIntegrationTests() {
   assert.strictEqual(parsedNotFound.exists, false);
 
   const activeWf = WorkflowService.createWorkflow('MCP Integration Test Workflow');
-  const wfStatusFound = await client.callTool({
+  const wfStatusFound = await callMcpTool({
     name: 'get_workflow_status',
     arguments: { workflow_id: activeWf.id }
   });
@@ -175,7 +179,7 @@ export async function runMcpIntegrationTests() {
   console.log('   ✓ get_workflow_status safely verified non-existent and active workflows.');
 
   console.log('11. Testing MCP Tool Call: generate_schedule...');
-  const schedResult = await client.callTool({
+  const schedResult = await callMcpTool({
     name: 'generate_schedule',
     arguments: { available_time: 180, status: 'proposed' }
   });
@@ -185,7 +189,7 @@ export async function runMcpIntegrationTests() {
   console.log('   ✓ generate_schedule created proposed schedule.');
 
   console.log('12. Testing MCP Tool Call: retrieve_preferences...');
-  const prefResult = await client.callTool({
+  const prefResult = await callMcpTool({
     name: 'retrieve_preferences',
     arguments: {}
   });
@@ -195,7 +199,7 @@ export async function runMcpIntegrationTests() {
 
   console.log('13. Testing MCP Input Validation Error Handling...');
   try {
-    await client.callTool({
+    await callMcpTool({
       name: 'create_task',
       arguments: {
         title: 'Invalid Priority Task',
@@ -208,7 +212,7 @@ export async function runMcpIntegrationTests() {
   }
 
   console.log('14. Testing MCP Tool Call: create_interview_session...');
-  const interviewResult = await client.callTool({
+  const interviewResult = await callMcpTool({
     name: 'create_interview_session',
     arguments: {
       category: 'technical',
@@ -225,7 +229,7 @@ export async function runMcpIntegrationTests() {
   console.log(`   ✓ create_interview_session returned session ID ${parsedInterview.session_id}`);
 
   console.log('15. Testing MCP Tool Call: get_interview_history...');
-  const historyResult = await client.callTool({
+  const historyResult = await callMcpTool({
     name: 'get_interview_history',
     arguments: {}
   });

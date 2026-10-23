@@ -109,6 +109,7 @@ export async function runInterviewTests() {
     total_questions: 2
   });
 
+  assert.ok(hrSession.questions && hrSession.questions.length > 0);
   const hrQ1 = hrSession.questions[0];
   console.log(`   ✓ HR Question: [${hrQ1.question_type}] ${hrQ1.question_text.substring(0, 65)}...`);
 
@@ -269,6 +270,7 @@ export async function runInterviewTests() {
 
   assert.ok(compSession.id);
   assert.strictEqual(compSession.category, 'competitive_exam');
+  assert.ok(compSession.questions && compSession.questions.length > 0);
   const compQ = compSession.questions[0];
   assert.ok(compQ.question_text.length > 20, 'Expected non-empty question statement');
   console.log(`   ✓ Competitive exam session created: "${compSession.title}"`);
