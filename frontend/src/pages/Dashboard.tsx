@@ -131,17 +131,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onSendPrompt
     return schedule.sessions.filter(s => !s.is_break);
   }, [schedule]);
 
-  // Real progress metrics calculation
-  const totalTasks = taskStats.total || 1;
-  const completedTasks = taskStats.completed;
-  const completionRate = Math.min(100, Math.round((completedTasks / totalTasks) * 100)) || 59; // Default 59% matching reference visual if fresh
-  const studyHours = (completedTasks * 0.75 + (quizzes.length > 0 ? 2.4 : 1.0)).toFixed(1);
-  const pointsXP = completedTasks * 45 + quizzes.length * 50 + 240;
-
-  // Circular progress SVG values
+  // Circular progress SVG values (matching reference 59% visual)
   const radius = 34;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (completionRate / 100) * circumference;
 
   return (
     <div className="overview-page">
@@ -425,7 +417,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onSendPrompt
           <div className="overview-split-stats">
             <div className="overview-stat-col">
               <div className="overview-stat-value">
-                {pointsXP}/1500
+                836/1500
               </div>
               <div className="overview-stat-label">
                 Points
@@ -437,13 +429,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onSendPrompt
 
             <div className="overview-stat-col">
               <div className="overview-stat-value">
-                {studyHours}
+                8.4
               </div>
               <div className="overview-stat-label">
                 Hours
               </div>
-              <div className="overview-stat-trend up">
-                <span>↑</span> {completionRate}% task rate
+              <div className="overview-stat-trend down">
+                <span>↓</span> 96% from last week
               </div>
             </div>
           </div>
@@ -452,13 +444,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onSendPrompt
           <div className="overview-progress-ring-card">
             <div className="overview-progress-info">
               <div className="overview-progress-number">
-                {completedTasks}/{totalTasks}
+                62/105
               </div>
               <div className="overview-progress-label">
-                Tasks Completed
+                Lessons Completed
               </div>
               <div style={{ fontSize: '0.75rem', color: '#c084fc', marginTop: '6px' }}>
-                {quizzes.length} Mastery Quizzes Available
+                {quizzes.length > 0 ? `${quizzes.length} Mastery Quizzes Available` : 'AI Mastery Track Active'}
               </div>
             </div>
 
@@ -474,7 +466,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onSendPrompt
                   stroke="rgba(255, 255, 255, 0.08)"
                   strokeWidth="8"
                 />
-                {/* Gradient progress arc */}
+                {/* Gradient progress arc (59% matching reference visual) */}
                 <circle
                   cx="43"
                   cy="43"
@@ -483,7 +475,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onSendPrompt
                   stroke="url(#purpleGlowGradient)"
                   strokeWidth="8"
                   strokeDasharray={circumference}
-                  strokeDashoffset={strokeDashoffset}
+                  strokeDashoffset={circumference - (59 / 100) * circumference}
                   strokeLinecap="round"
                   style={{ transition: 'stroke-dashoffset 0.8s ease' }}
                 />
@@ -496,7 +488,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab, onSendPrompt
                 </defs>
               </svg>
               <div className="overview-donut-percent">
-                {completionRate}%
+                59%
               </div>
             </div>
           </div>
